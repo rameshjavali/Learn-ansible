@@ -1,0 +1,19 @@
+- name: Install and configure Nginx
+  hosts: all
+  become: yes   # run tasks with sudo
+  tasks:
+    - name: Install Nginx
+      dnf:        # use 'yum' if your OS is RHEL/CentOS 7 or Amazon Linux 2
+        name: nginx
+        state: present
+
+    - name: Start and enable Nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy custom index.html
+      copy:
+        content: "<h1>Hello from Ansible!</h1>"
+        dest: /usr/share/nginx/html/index.html
