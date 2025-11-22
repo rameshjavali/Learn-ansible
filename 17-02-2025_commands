@@ -1,0 +1,30 @@
+    1  22/11/25 09:13:25 ls 
+    2  22/11/25 09:20:46 pippython3 --version
+    3  22/11/25 09:20:46 pip3 --version
+    4  22/11/25 09:20:50 python3 --version
+    5  22/11/25 09:20:50 pip3 --version
+    6  22/11/25 09:21:49 pip3 install ansible
+    7  22/11/25 09:23:35 ansible --version
+    8  22/11/25 09:24:22 git clone
+    9  22/11/25 09:24:27 https://github.com/rameshjavali/Learn-ansible.git
+   10  22/11/25 09:24:39 git clone https://github.com/rameshjavali/Learn-ansible.git
+   11  22/11/25 09:24:44 ls -lart
+   12  22/11/25 09:24:53 cd Learn-ansible/
+   13  22/11/25 09:25:21 alias l='ls -lart'
+   14  22/11/25 09:25:23 l
+   15  22/11/25 09:30:26 ls -lart
+   16  22/11/25 09:30:35 cd Learn-ansible/
+   17  22/11/25 09:31:30 ansible-playbook -i inv 
+   18  22/11/25 09:31:33 l
+   19  22/11/25 09:31:36 ls -lart
+   20  22/11/25 09:39:46 vi inv 
+   21  22/11/25 09:43:46 ls -lart
+   22  22/11/25 09:44:20 ansible-playbook -i hosts.inv 01-first.yml 
+   23  22/11/25 09:45:14 ansible-playbook -i inv 01-first.yml 
+   24  22/11/25 09:46:33 ansible-playbook -i inv 01-first.yml -e ansible_username=ec2-user -e ansible_password =DevOps321
+   25  22/11/25 09:48:22 ansible-playbook -i inv 01-first.yml -e ansible_username=ec2-user -e ansible_password =DevOps321ansible-playbook -i inv 01-first.yml -e ansible_username=ec2-user -e ansible_password=DevOps321
+   26  22/11/25 09:48:27 ansible-playbook -i inv 01-first.yml -e ansible_username=ec2-user -e ansible_password=DevOps321
+   27  22/11/25 09:49:20 l
+   28  22/11/25 09:49:21 ls
+   29  22/11/25 09:49:47 ansible-playbook -i inv nginx.yaml -e ansible_username=ec2-user -e ansible_password=DevOps321
+   30  22/11/25 09:57:40 history >>17-02-2025_commands
