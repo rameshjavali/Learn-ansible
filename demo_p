@@ -1,0 +1,137 @@
+You are a senior SaaS founder, DevOps architect, product manager, and UX designer.
+
+I want to build a startup product called "OpsNote" (working name).
+
+The vision is:
+"OneNote for DevOps Engineers, SREs, DBAs, Cloud Engineers, and Platform Teams."
+
+I do NOT want a generic note-taking app. I want a product that DevOps engineers would prefer over OneNote, Notion, Confluence, and personal markdown files.
+
+Your task:
+
+1. Analyze the daily workflow of:
+   - DevOps Engineers
+   - SREs
+   - Platform Engineers
+   - Database Administrators
+   - Cloud Engineers
+
+2. List the biggest problems they face when using:
+   - OneNote
+   - Notion
+   - Confluence
+   - Obsidian
+   - Google Docs
+
+3. Identify underserved opportunities worth building a company around.
+
+4. Propose 10 product ideas.
+
+For each idea provide:
+   - Problem statement
+   - Target users
+   - Why existing tools fail
+   - Unique differentiator
+   - Estimated market demand
+   - Difficulty level
+   - Revenue potential
+
+5. Select the best idea and create:
+
+   A. Product Vision
+   B. Core Features
+   C. User Personas
+   D. MVP Scope
+   E. V1 Scope
+   F. V2 Scope
+   G. Long-term Roadmap
+
+6. Design an architecture using:
+
+   Backend:
+   - Python
+   - FastAPI
+   - PostgreSQL
+
+   Frontend:
+   - React
+   - TypeScript
+
+   Desktop:
+   - Tauri
+
+   Infrastructure:
+   - Docker
+   - Kubernetes
+   - Azure
+
+7. Suggest:
+   - Database schema
+   - API design
+   - Security model
+   - RBAC model
+   - Search architecture
+   - AI integration strategy
+
+8. Compare this idea against:
+   - OneNote
+   - Notion
+   - Confluence
+   - Obsidian
+   - Logseq
+
+Show where we can realistically win.
+
+9. Estimate:
+   - Time for solo founder
+   - Time with Claude assistance
+   - Development milestones for 3 months, 6 months, 1 year
+
+10. Be brutally honest.
+
+Do not give generic startup advice.
+
+Provide a complete Product Requirements Document (PRD), architecture document, competitive analysis, and go-to-market strategy.
+
+Think like a founder trying to build a $100M company, not a hobby project.
+
+
+
+Based on the selected idea, generate:
+
+1. Complete system architecture
+2. PostgreSQL schema
+3. FastAPI project structure
+4. React project structure
+5. Tauri desktop structure
+6. API contracts
+7. Authentication design
+8. Search design
+9. AI assistant design
+10. Complete development plan
+
+Output production-grade architecture diagrams, folder structures, and implementation details.
+
+Assume this product will eventually support 100,000+ users.
+
+===============================================
+Now generate the complete MVP implementation.
+
+Start with:
+
+Phase 1:
+- FastAPI backend
+- PostgreSQL database
+- JWT Authentication
+- User Management
+- Incident CRUD
+- Runbook CRUD
+
+Create every file with full code.
+
+After each file, explain where it belongs.
+
+Follow production standards.
+
+Do not give pseudocode.
+
