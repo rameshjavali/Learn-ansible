@@ -1,0 +1,412 @@
+"If an EKS node becomes unhealthy, I follow a layer-by-layer approach: Kubernetes, node OS, and AWS infrastructure."
+
+1. Verify the node status
+
+kubectl get nodes
+
+kubectl describe node <node-name>
+
+I check whether the node is NotReady, under MemoryPressure, DiskPressure, or has network-related issues.
+
+2. Check system pods
+
+kubectl get pods -n kube-system
+
+I verify critical components like:
+
+aws-node (VPC CNI)
+kube-proxy
+CoreDNS
+
+Failures in these components can impact node health.
+
+3. Investigate the EC2 instance
+
+I connect to the underlying EC2 instance and check:
+
+df -h
+
+free -h
+
+top
+
+Looking for:
+
+Disk full
+Memory exhaustion
+CPU saturation
+4. Check kubelet health
+
+sudo systemctl status kubelet
+
+sudo journalctl -u kubelet
+
+If kubelet is down or unable to communicate with the control plane, the node becomes NotReady.
+
+5. Validate networking
+
+For EKS, I check:
+
+Security groups
+Route tables
+Available subnet IPs
+AWS VPC CNI logs
+
+A common issue is subnet IP exhaustion, preventing pods from getting IP addresses.
+
+6. Check AWS health
+
+In AWS Console I verify:
+
+EC2 instance status checks
+Auto Scaling Group status
+EKS node group health
+7. Remediation
+
+Depending on the root cause:
+
+Restart kubelet
+Clean disk space
+Increase node capacity
+Fix networking issues
+Drain and replace the node
+
+kubectl drain <node-name> --ignore-daemonsets
+
+If the node is irrecoverable, I terminate the EC2 instance and let the managed node group automatically provision a replacement.
+
+Interview-ready answer (1 minute)
+
+"When an EKS node becomes unhealthy, I first check the node state using kubectl get nodes and kubectl describe node. Then I verify kube-system pods such as aws-node, kube-proxy, and CoreDNS. Next, I log into the EC2 instance to check CPU, memory, disk usage, and kubelet logs. I also validate AWS networking, subnet IP availability, and EC2 health checks. Once the root cause is identified, I either restart services, resolve resource constraints, fix networking issues, or drain and replace the node through the EKS managed node group. My goal is to restore workload availability quickly while identifying the underlying cause to prevent recurrence."
+
+=============================================
+
+For an interview, give a structured answer:
+
+"When designing HA (High Availability) and DR (Disaster Recovery) on AWS, I first identify the RTO and RPO requirements, then design for failures at multiple levels: Availability Zone, Region, and service level."
+
+High Availability (HA)
+
+Goal: Application should continue running even if one AZ fails.
+
+Typical design:
+
+Deploy application across multiple Availability Zones
+Use Application Load Balancer (ALB) across AZs
+Run applications on:
+EKS
+ECS
+EC2 Auto Scaling Groups
+Use Multi-AZ RDS
+Store files in S3
+Use Auto Scaling for automatic node replacement
+
+Architecture:
+
+Users
+
+|
+
+ALB
+
+|
+
+-------------------
+
+AZ-1      AZ-2
+
+EKS       EKS
+
+Pods      Pods
+
+-------------------
+
+|
+
+RDS Multi-AZ
+
+If AZ-1 fails, traffic automatically shifts to AZ-2.
+
+Disaster Recovery (DR)
+
+Goal: Recover when an entire AWS Region fails.
+
+Typical design:
+
+Primary Region (Mumbai)
+
+|
+
+Cross Region Replication
+
+|
+
+Secondary Region (Hyderabad/Singapore)
+
+Components:
+
+RDS Cross-Region Read Replica
+S3 Cross Region Replication (CRR)
+ECR image replication
+Infrastructure as Code using Terraform/CloudFormation
+Route53 DNS failover
+DR Strategies
+1. Backup & Restore (Lowest Cost)
+Daily backups
+Restore in another region when disaster occurs
+
+RTO: Hours
+RPO: Hours
+
+2. Pilot Light
+Critical databases replicated
+Minimal infrastructure running
+
+RTO: Tens of minutes
+
+3. Warm Standby
+Smaller version of production environment always running
+
+RTO: Minutes
+
+4. Active-Active (Best HA/DR)
+Full environment running in two regions
+Route53 latency/failover routing
+
+RTO: Near Zero
+RPO: Near Zero
+
+Interview Example Answer
+
+"For HA, I deploy workloads across multiple Availability Zones using an ALB, Auto Scaling Groups or EKS node groups, and Multi-AZ RDS so the application survives an AZ failure. For DR, I replicate data to a secondary AWS region using RDS replicas and S3 Cross-Region Replication. Route53 is configured for failover. Depending on business requirements, I choose Backup & Restore, Pilot Light, Warm Standby, or Active-Active architectures based on the required RTO and RPO."
+
+Follow-up: "What are RTO and RPO?"
+
+RTO (Recovery Time Objective): How quickly the application must be restored.
+
+Example: 15 minutes
+
+RPO (Recovery Point Objective): How much data loss is acceptable.
+
+Example: 5 minutes of data
+
+This is usually the answer interviewers expect from a DevOps/SRE/Cloud Engineer for "How would you design HA and DR in AWS?".
+
+=======================================
+
+Interview answer:
+
+"If nodes are under heavy load, I follow a structured troubleshooting approach to determine whether it's CPU, memory, disk, network, or application-related."
+
+1. Confirm the problem
+
+Check node utilization:
+
+kubectl top nodes
+
+kubectl top pods -A
+
+Questions I ask:
+
+Is CPU > 80-90%?
+Is Memory > 80-90%?
+Is only one node affected or the whole cluster?
+2. Identify noisy pods
+
+kubectl top pods -A --sort-by=cpu
+
+kubectl top pods -A --sort-by=memory
+
+I identify which workloads are consuming most resources.
+
+Example:
+
+payment-service   3 CPU
+
+order-service     2 CPU
+
+Now I know where the load is coming from.
+
+3. Check node conditions
+
+kubectl describe node <node>
+
+Looking for:
+
+MemoryPressure
+
+DiskPressure
+
+PIDPressure
+
+These indicate node resource exhaustion.
+
+4. Check application behavior
+
+kubectl logs <pod>
+
+Look for:
+
+Infinite loops
+Excessive retries
+Connection timeouts
+Memory leaks
+
+Sometimes one bad deployment causes CPU spikes.
+
+5. Verify requests and limits
+
+kubectl describe pod <pod>
+
+Check:
+
+resources:
+
+requests:
+
+cpu: 500m
+
+limits:
+
+cpu: 1
+
+If limits are missing, a pod may consume excessive resources and starve other workloads.
+
+6. Infrastructure checks
+
+SSH to the node:
+
+top
+
+htop
+
+free -h
+
+df -h
+
+Check:
+
+CPU saturation
+Memory exhaustion
+Swap activity
+Disk utilization
+7. Scaling decision
+
+If the workload is legitimate growth:
+
+Scale pods
+
+kubectl scale deployment app --replicas=10
+
+or use HPA:
+
+kubectl get hpa
+
+Scale nodes
+
+aws eks update-nodegroup-config
+
+or increase desired capacity in the Auto Scaling Group.
+
+8. Root cause analysis
+
+Determine:
+
+Traffic spike?
+Bad release?
+Memory leak?
+Inefficient query?
+Resource limits not defined?
+
+Fix the actual cause, not just scale.
+
+1-minute interview answer
+
+"When nodes are under heavy load, I first check node and pod utilization using kubectl top nodes and kubectl top pods. I identify whether CPU, memory, disk, or network resources are exhausted. Then I check node conditions with kubectl describe node and review application logs to find misbehaving workloads. I verify resource requests and limits, and inspect the underlying node for OS-level bottlenecks. Based on findings, I either optimize the application, fix resource configuration, scale pods using HPA, or add more worker nodes. Finally, I perform a root cause analysis to prevent recurrence."
+
+==================================================================
+
+Looks like you're asking an interview-style question:
+
+"Our application in AWS impacts thousands/millions of customers. How would you handle it if there is an issue?"
+
+A strong answer:
+
+"For a customer-facing application impacting thousands of users, my priority is to restore service first, then identify the root cause. I follow an incident management approach."
+
+1. Assess the impact
+How many customers are affected?
+Is it complete outage or partial degradation?
+Which components are failing? (ALB, EKS, RDS, Redis, API, etc.)
+
+Check:
+
+CloudWatch
+
+kubectl get pods
+
+kubectl get nodes
+
+2. Stabilize the service
+
+If traffic spike:
+
+Scale pods (HPA)
+Scale nodes (Cluster Autoscaler)
+Increase ASG capacity
+
+If bad deployment:
+
+kubectl rollout undo deployment <app>
+
+Rollback immediately.
+
+3. Investigate
+
+Check:
+
+kubectl top nodes
+
+kubectl top pods
+
+Look for:
+
+CPU bottleneck
+Memory bottleneck
+Database saturation
+Network issues
+
+Review:
+
+kubectl logs
+
+CloudWatch Logs
+
+ALB metrics
+
+4. Communicate
+
+Keep stakeholders informed:
+
+"API latency increased due to database saturation. Team is scaling read replicas and traffic is recovering."
+
+Communication is critical during major incidents.
+
+5. Root Cause Analysis (RCA)
+
+After recovery:
+
+What failed?
+Why wasn't it detected earlier?
+What monitoring alert was missing?
+
+Implement:
+
+Better alerts
+Auto scaling improvements
+Runbooks
+Capacity planning
+Interview Answer (Best)
+
+"If an AWS-hosted application serving thousands of customers experiences issues, I first assess the business impact and identify whether it's an infrastructure, application, or database problem. My immediate focus is restoring service through scaling, failover, or rollback if required. Once stability is achieved, I analyze metrics, logs, and dashboards using CloudWatch, Kubernetes, and application monitoring tools to identify the root cause. Finally, I conduct an RCA and implement preventive measures such as improved monitoring, autoscaling, and resiliency enhancements to avoid recurrence."
+
